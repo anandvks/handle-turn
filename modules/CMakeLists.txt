@@ -2,14 +2,18 @@
 # Author: Ugo Pattacini
 # email:  ugo.pattacini@iit.it
 
-add_subdirectory(reaching)
-add_subdirectory(gaze-controller)
-add_subdirectory(teleop)
-add_subdirectory(tripodJoystickControl)
-add_subdirectory(robotJoystickControl)
-add_subdirectory(tfPublisher)
-add_subdirectory(textImage)
+cmake_minimum_required(VERSION 2.8.9)
+project(modules)
 
-if(NOT WIN32)
-    add_subdirectory(audioSplitter)
-endif()
+get_property(cer_kinematics_INCLUDE_DIRS
+             TARGET cer_kinematics
+             PROPERTY BUILD_INTERFACE_INCLUDE_DIRECTORIES)
+
+include_directories(${YARP_INCLUDE_DIRS}
+                    ${ICUB_INCLUDE_DIRS}
+                    ${cer_kinematics_INCLUDE_DIRS})
+
+add_definitions(-D_USE_MATH_DEFINES)
+add_executable(compute-trajectory compute-trajectory.cpp)
+
+target_link_libraries(compute-trajectory ${YARP_LIBRARIES} cer_kinematics)
