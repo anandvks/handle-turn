@@ -18,6 +18,7 @@
 #include <string>
 #include <iostream>
 #include <iomanip>
+#include <fstream>
 #include <cmath>
 #include <algorithm>
 
@@ -76,6 +77,7 @@ int main(int argc, char *argv[])
         cout<<"--handle-length <double> [m]"<<endl;
         cout<<"--rotation <double> [deg]"<<endl;
         cout<<"--points <int>"<<endl;
+        cout<<"--output-file <file-name>"<<endl;
         return 0;
     }
 
@@ -91,6 +93,7 @@ int main(int argc, char *argv[])
     double handle_length=rf.check("handle-length",Value(0.08)).asDouble();
     double rotation=rf.check("rotation",Value(10.0)).asDouble();
     int points=rf.check("points",Value(1)).asInt();
+    string output_file=rf.check("output-file",Value("output.txt")).asString();
 
     Vector q0(12);
     //default torso tripod
@@ -122,8 +125,15 @@ int main(int argc, char *argv[])
     Matrix C0=eye(4,4);
     C0.setCol(3,H0.getCol(3));
     C0(1,3)+=handle_length;
+    
+    ofstream fout(output_file.c_str());
+    if (!fout.is_open())
+    {
+        cerr<<"unable to write to \""<<output_file<<"\""<<endl;
+        return 2;
+    }
 
-    cout<<formatOutput(solver,0,H0,q0)<<endl;
+    fout<<formatOutput(solver,0,H0,q0)<<endl;
 
     H0=SE3inv(C0)*H0;
     Vector axis=yarp::math::sign(handle_length)*C0.getCol(0);    
@@ -137,9 +147,11 @@ int main(int argc, char *argv[])
         solver.setInitialGuess(q);
         solver.ikin(Hd,q);
 
-        cout<<formatOutput(solver,i,Hd,q)<<endl;
+        fout<<formatOutput(solver,i,Hd,q)<<endl;
     }
 
+    cout<<"data written to \""<<output_file<<"\""<<endl;
+    fout.close();
     return 0;
 }
 
