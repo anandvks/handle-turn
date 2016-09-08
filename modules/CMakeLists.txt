@@ -11,4 +11,4 @@ include_directories(${YARP_INCLUDE_DIRS} ${cer_kinematics_INCLUDE_DIRS})
 add_definitions(-D_USE_MATH_DEFINES)
 add_executable(compute-trajectory compute-trajectory.cpp)
 target_link_libraries(compute-trajectory ${YARP_LIBRARIES} cer_kinematics)
-
+install(TARGETS compute-trajectory DESTINATION bin)
